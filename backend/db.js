@@ -1,6 +1,5 @@
-
 const mongoose = require('mongoose');
-const mongoURI = 'mongodb://localhost:27017'; // Replace with your actual MongoDB URL
+const mongoURI = 'mongodb://localhost:27017/mymongsp'; // Your actual MongoDB URL
 
 const connectToMongo = async () => {
   try {
@@ -14,6 +13,9 @@ const connectToMongo = async () => {
     process.exit(1); // Exit the process on connection failure
   }
 };
+
+module.exports = connectToMongo;
+
 // const connectToMongo = async () => {
 //     try {
 //         await mongoose.connect(mongoURI);
@@ -22,5 +24,3 @@ const connectToMongo = async () => {
 //         console.error("Error connecting to MongoDB:", error);
 //     }
 // };
-
-module.exports = connectToMongo;
