@@ -2,12 +2,19 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import NoteContext from '../context/notes/NoteContext';
 import Navitem from './Navitem';
 import AddNote from './AddNote';
+import { useNavigate } from 'react-router-dom';
 
-export default function Notes() {
+export default function Notes(props) {
   const context = useContext(NoteContext);
+  let navigate = useNavigate();
   const {notes, getNotes, editNote} = context;
     useEffect(() => {
+      if(localStorage.getItem('token')){
         getNotes()
+      }
+      else{
+          navigate('/login')
+      }
     }, [])
 
   const ref = useRef(null)  
@@ -22,6 +29,7 @@ export default function Notes() {
   const handleClick = (e)=>{ 
     editNote(note.id, note.etitle, note.edescription, note.etag)
     refClose.current.click();
+    props.showAlert("Note updated successfully", "success");
 }
 
   const onChange = (e) => {
@@ -30,7 +38,7 @@ export default function Notes() {
 
   return (
     <div>
-      <AddNote/>
+      <AddNote showAlert = {props.showAlert}/>
       <button ref={ref} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Launch demo modal
             </button>
@@ -45,11 +53,11 @@ export default function Notes() {
                             <form className="my-3">
                                 <div className="mb-3">
                                     <label htmlFor="title" className="form-label">Title</label>
-                                    <input type="text" className="form-control" id="etitle" name="etitle" value={note.etitle} aria-describedby="emailHelp" onChange={onChange} />
+                                    <input type="text" className="form-control" id="etitle" name="etitle" value={note.etitle} aria-describedby="emailHelp" onChange={onChange} minLength = {2} required/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="description" className="form-label">Description</label>
-                                    <input type="text" className="form-control" id="edescription" name="edescription" value={note.edescription} onChange={onChange} />
+                                    <input type="text" className="form-control" id="edescription" name="edescription" value={note.edescription} onChange={onChange} minLength = {3} required/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="tag" className="form-label">Tag</label>
@@ -60,16 +68,17 @@ export default function Notes() {
                         </div>
                         <div className="modal-footer">
                             <button ref={refClose} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button onClick={handleClick} type="button" className="btn btn-primary">Update Note</button>
+                            <button disabled={note.etitle.length < 2 || note.edescription.length < 3} onClick={handleClick} type="button" className="btn btn-primary">Update Note</button>
                         </div>
                     </div>
                 </div>
             </div>
       <div className="container my-3">
         <h2>Your notes will be displayed below</h2>
-        <div className="row">
+        <div className="row my-3">
+          {notes.length === 0 && 'No notes to display'}
           {notes.map((note) => {
-            return <Navitem key={note._id} note={note}  updateNote={updateNote} />; // added a key prop
+            return <Navitem key={note._id} note={note}  updateNote={updateNote} showAlert={props.showAlert}/>; // added a key prop
           })}
         </div>
       </div>
